@@ -1,5 +1,5 @@
 # Local Postgres. Settings come from .env if you have one, otherwise the defaults below.
-# Data is kept in a volume, so it survives restarts. `make reset` wipes it.
+# Data is kept in a volume, so it survives restarts. `docker compose down -v` wipes it.
 
 services:
   postgres:

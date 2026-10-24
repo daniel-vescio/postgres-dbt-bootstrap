@@ -1,94 +1,87 @@
 # postgres-dbt-bootstrap
 
-A simple Postgres + dbt setup I use to spin up PoCs. Clone it, run `make up`, and start building.
+A simple Postgres + dbt starter for PoCs. Clone it, run the setup commands below, and start building models.
 
-Postgres runs in Docker and dbt runs locally, so it feels like any other dbt project. It's deliberately minimal, so treat it as a starting point and add what you need.
+Postgres runs in Docker and dbt runs locally, so it works like any other dbt project. It's deliberately minimal. Add what you need as you go.
 
-## What's in it
+**This is set up for Windows.** All commands below are for PowerShell.
+
+## What's included
 
 - Postgres 18 in Docker, with data kept between restarts
-- dbt Core 1.12, pinned with [uv](https://docs.astral.sh/uv/)
+- dbt Core 1.12, with versions pinned by [uv](https://docs.astral.sh/uv/)
 - `bronze` / `silver` / `gold` schemas
-- A small script to load CSVs into Postgres
-- A tiny example pipeline (seed → staging → snapshot → incremental fact) you can delete
-- sqlfluff and a basic GitHub Actions workflow
+- A script to load CSVs into Postgres
+- A small example pipeline (seed → staging → snapshot → incremental fact) you can delete
+- sqlfluff for linting
+- A GitHub Actions workflow that lints and runs `dbt build` (delete `.github/workflows/ci.yml` if you don't need it)
 
 ## Getting started
 
-You'll need [Docker](https://www.docker.com/products/docker-desktop/) and [uv](https://docs.astral.sh/uv/getting-started/installation/). `make` is optional (see [Without make](#without-make)).
+You'll need [Docker Desktop](https://www.docker.com/products/docker-desktop/) and [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
-```bash
-make up            # start Postgres and install dbt
-uv run dbt build   # build the example
+Start Docker Desktop before running anything. If you get `open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified`, Docker Desktop isn't running.
+
+```powershell
+docker compose up -d --wait   # start Postgres
+uv sync                       # install dbt
+uv run dbt debug              # check dbt can connect
+uv run dbt build              # build the example
 ```
 
-To skip the `uv run` prefix, activate the environment with `source .venv/bin/activate` (Windows: `.venv\Scripts\activate`). VS Code does this for you.
+To skip the `uv run` prefix, activate the environment with `.venv\Scripts\activate` and run `dbt build` directly. VS Code activates it for you. If PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
 
-Connect your SQL client of choice to `localhost:5432`, database `poc`, user `dbt`, password `dbt`.
+To connect a SQL client, use `localhost:5432`, database `poc`, user `dbt`, password `dbt`. These are the defaults (see [Settings](#settings)).
 
 ## Day to day
 
-| What | How |
+| What | Command |
 |---|---|
-| Start or pick up where you left off | `make up` |
-| Run dbt | `dbt build -s my_model` (or any dbt command) |
-| Load CSVs from `data/` | `make load` |
-| Lint / fix SQL | `make lint` / `make fix` |
-| Browse docs and lineage | `make docs` |
-| Stop for the day (data is kept) | `make down` |
-| Start from a clean database | `make reset` |
+| Start Postgres | `docker compose up -d --wait` |
+| Run dbt | `uv run dbt build -s my_model` (or any dbt command) |
+| Load CSVs from `data/` | `uv run python scripts/load.py` |
+| Lint SQL | `uv run sqlfluff lint models` |
+| Fix SQL | `uv run sqlfluff fix models` |
+| View docs and lineage | `uv run dbt docs generate; uv run dbt docs serve --port 8080` |
+| Stop Postgres (data is kept) | `docker compose down` |
+| Wipe the database and start fresh | `docker compose down -v; docker compose up -d --wait` |
 
 ## Layers
 
 | Schema | What goes in it |
 |---|---|
-| `bronze` | Raw data as it lands: seeds and loaded files |
+| `bronze` | Raw data: seeds and loaded files |
 | `silver` | Cleaned and typed: staging views and snapshots |
-| `gold` | Tables people actually query |
+| `gold` | Tables people query |
 
-Models land in exactly these schemas (not `public_silver`). Anything you don't configure goes to `public`.
+Models build into exactly these schemas (not `public_silver`). Anything without a layer goes to `public`.
 
 ## Loading files
 
-Drop CSVs into `data/` and run `make load`. Each file becomes a table in `bronze`, named after the file (`Customer Extract.csv` becomes `bronze.customer_extract`). Every run reloads them from scratch.
+Put CSVs in `data/` and run `uv run python scripts/load.py`. Each file becomes a table in `bronze`, named after the file (`Customer Extract.csv` becomes `bronze.customer_extract`). Every run reloads them from scratch.
 
-Columns load as text on purpose. Do the typing in silver, where it's visible and testable. Then declare the tables in `models/bronze/_sources.yml` and use them with `{{ source('bronze', 'customer_extract') }}`.
+All columns load as text. Do the typing in silver, where it's visible and testable. Then declare the tables in `models/bronze/_sources.yml` and reference them with `{{ source('bronze', 'customer_extract') }}`.
 
-`data/` is gitignored, so client files stay on your machine.
+`data/` is gitignored, so client files aren't committed.
 
 ## Starting a real PoC
 
-```bash
-make clean-examples   # remove the example models, seeds and snapshot
-make reset            # clear their tables
+Remove the example models, seeds and snapshot, then wipe the database to drop their tables:
+
+```powershell
+Remove-Item -Recurse -Force seeds/example, snapshots/example, models/silver/example, models/gold/example
+docker compose down -v; docker compose up -d --wait
 ```
 
-Commit the `uv.lock` that gets created on your first `make up`, so everyone gets the same versions.
+`uv.lock` pins the exact package versions. Keep it committed so everyone on the project gets the same versions. Run `uv lock --upgrade` to update them.
 
 ## Settings
 
-Defaults work as is. To change them, copy `.env.example` to `.env`. Docker, dbt and the loader all read it.
+The defaults work without any changes. To change them, copy `.env.example` to `.env` and edit it.
 
-- **Port 5432 already taken?** Set `POSTGRES_PORT=5433`, or `make down` in the other project first.
-- **Using an existing Postgres instead?** Put its details in `.env`, skip Docker and run `uv sync`. Everything else works the same.
+Docker and the CSV loader read `.env` automatically. dbt doesn't, so run it with `uv run --env-file .env dbt build`, or run `$env:UV_ENV_FILE = ".env"` once per terminal so `uv run dbt` picks it up. Running `dbt` from an activated environment won't read `.env`.
 
-## CI
-
-On every push to `main` and every pull request, GitHub Actions lints the SQL, starts Postgres and runs `dbt build`. Models built on files in `data/` are only compiled, since those files never get committed. Delete `.github/workflows/ci.yml` if you don't need it.
-
-## A few notes
-
-- **Keep model names lowercase.** dbt quotes names on Postgres, so `fct_Orders` becomes a table you can only query as `"fct_Orders"`.
-- **Incremental models** keep old logic for rows already loaded. Run `dbt build --full-refresh -s my_model` after changing them.
-- **Want to see the snapshot work?** Change account `A003` to `closed` in `seeds/example/example_accounts.csv`, bump its `updated_at`, run `dbt build`, then look at `silver.snap_example_accounts`.
-
-## Without make
-
-| make | Run this instead |
-|---|---|
-| `make up` | `docker compose up -d --wait` then `uv sync` |
-| `make down` | `docker compose down` |
-| `make reset` | `docker compose down -v` then `docker compose up -d --wait` |
-| `make load` | `uv run python scripts/load.py` |
-| `make lint` | `uv run sqlfluff lint models` |
-| `make docs` | `uv run dbt docs generate` then `uv run dbt docs serve --port 8080` |
+- **Changing the user, password or database name:** Postgres only applies these when the database is first created. After changing them, run `docker compose down -v; docker compose up -d --wait`. This deletes all data.
+- **Changing the dbt version:** update the `dbt-core` / `dbt-postgres` versions in `pyproject.toml`, then run `uv sync`.
+- **Port 5432 already in use:** set `POSTGRES_PORT=5433`, or stop the other project with `docker compose down`.
+- **Using an existing Postgres server:** put its details in `.env`, skip Docker, and run `uv sync`. Everything else works the same.
