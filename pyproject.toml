@@ -1,0 +1,17 @@
+[project]
+name = "postgres-dbt-bootstrap"
+version = "0.1.0"
+description = "Simple Postgres + dbt setup for spinning up PoCs"
+readme = "README.md"
+requires-python = ">=3.10,<3.15"
+dependencies = [
+    "dbt-core>=1.12,<1.13",
+    "dbt-postgres>=1.10,<2",
+    "psycopg2-binary>=2.9,<3",
+    "python-dotenv>=1.2",
+    "sqlfluff>=4.4,<5",
+]
+
+[tool.uv]
+# Not a Python package. uv just manages the environment and lockfile.
+package = false

@@ -1,0 +1,14 @@
+seeds:
+  - name: example_accounts
+    description: Example accounts. Edit a row and bump updated_at to see the snapshot record history.
+    config:
+      column_types:
+        opened_on: date
+        updated_at: timestamp
+
+  - name: example_transactions
+    description: Example card and account transactions (AUD). Debits are negative.
+    config:
+      column_types:
+        transacted_at: timestamp
+        amount: numeric(12, 2)

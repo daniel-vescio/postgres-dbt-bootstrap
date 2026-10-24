@@ -1,0 +1,7 @@
+account_id,customer_id,account_type,status,opened_on,updated_at
+A001,C001,everyday,active,2023-02-14,2026-01-05 09:00:00
+A002,C001,savings,active,2023-02-14,2026-01-05 09:00:00
+A003,C002,everyday,active,2024-07-01,2026-01-05 09:00:00
+A004,C003,credit_card,active,2022-11-20,2026-01-05 09:00:00
+A005,C004,everyday,closed,2021-03-09,2026-01-05 09:00:00
+A006,C005,savings,active,2025-09-30,2026-01-05 09:00:00

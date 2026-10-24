@@ -1,0 +1,7 @@
+# Declare tables you've loaded from data/ so models can use {{ source('bronze', '<table>') }}.
+#
+# sources:
+#   - name: bronze
+#     schema: bronze
+#     tables:
+#       - name: customer_extract

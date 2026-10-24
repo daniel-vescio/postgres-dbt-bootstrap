@@ -1,0 +1,27 @@
+models:
+  - name: dim_example_accounts
+    description: Current state of each account, from the SCD2 snapshot.
+    columns:
+      - name: account_id
+        data_tests:
+          - unique
+          - not_null
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["active", "closed"]
+
+  - name: fct_example_transactions
+    description: One row per transaction. Incremental on transacted_at.
+    columns:
+      - name: transaction_id
+        data_tests:
+          - unique
+          - not_null
+      - name: account_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_example_accounts')
+                field: account_id

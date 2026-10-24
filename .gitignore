@@ -1,0 +1,18 @@
+# Python / uv
+.venv/
+__pycache__/
+
+# dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# Local settings, and files in data/ (never committed)
+.env
+data/*
+!data/.gitkeep
+
+# OS / editor
+.DS_Store
+.idea/

@@ -1,0 +1,15 @@
+# Lives in the project folder, so there's nothing to set up in ~/.dbt.
+# Defaults point at the local Docker container. Override them in .env.
+
+poc:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('POSTGRES_PORT', '5432') | as_number }}"
+      user: "{{ env_var('POSTGRES_USER', 'dbt') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD', 'dbt') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'poc') }}"
+      schema: public
+      threads: 4

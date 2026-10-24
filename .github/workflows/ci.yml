@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+
+      - run: uv sync
+      - run: uv run sqlfluff lint models
+      - run: docker compose up -d --wait
+
+      # data/ is never committed, so models built on those files can't run here.
+      # Build everything else, and just compile those.
+      - run: uv run dbt build --exclude "source:bronze+"
+      - run: uv run dbt compile --select "source:bronze+"

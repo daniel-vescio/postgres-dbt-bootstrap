@@ -1,0 +1,8 @@
+snapshots:
+  - name: snap_example_accounts
+    relation: ref('example_accounts')
+    description: SCD2 history of example accounts. Current rows have dbt_valid_to = null.
+    config:
+      unique_key: account_id
+      strategy: timestamp
+      updated_at: updated_at

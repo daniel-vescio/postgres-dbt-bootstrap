@@ -1,0 +1,21 @@
+models:
+  - name: stg_example__transactions
+    description: Typed and standardised transactions.
+    columns:
+      - name: transaction_id
+        data_tests:
+          - unique
+          - not_null
+      - name: account_id
+        data_tests:
+          - not_null
+      - name: currency
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["AUD"]
+      - name: direction
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["debit", "credit"]

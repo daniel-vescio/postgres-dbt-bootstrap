@@ -1,0 +1,2 @@
+# Keep LF line endings on every OS (CRLF breaks shell commands and some SQL tooling).
+* text=auto eol=lf

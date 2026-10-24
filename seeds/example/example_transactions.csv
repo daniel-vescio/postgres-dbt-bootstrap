@@ -1,0 +1,17 @@
+transaction_id,account_id,transacted_at,amount,currency,merchant,category
+T0001,A001,2026-01-02 08:15:00,-4.80,AUD,Corner Cafe,Dining
+T0002,A001,2026-01-02 12:40:00,-18.50,AUD,Lunch Bar,Dining
+T0003,A001,2026-01-03 09:00:00,3250.00,AUD,Employer Payroll,Income
+T0004,A001,2026-01-03 17:22:00,-142.35,AUD,Fresh Grocer,Groceries
+T0005,A002,2026-01-04 10:00:00,500.00,AUD,Transfer In,Transfer
+T0006,A003,2026-01-04 07:55:00,-6.20,AUD,Corner Cafe,Dining
+T0007,A003,2026-01-05 19:10:00,-89.99,AUD,Streaming Plus,Entertainment
+T0008,A004,2026-01-05 13:30:00,-1249.00,AUD,Tech Store,Shopping
+T0009,A004,2026-01-06 08:05:00,-62.10,AUD,Fuel Stop,Transport
+T0010,A001,2026-01-06 18:45:00,-37.00,AUD,City Transit,Transport
+T0011,A003,2026-01-07 09:00:00,2890.00,AUD,Employer Payroll,Income
+T0012,A006,2026-01-07 11:15:00,1000.00,AUD,Transfer In,Transfer
+T0013,A004,2026-01-08 20:30:00,-54.75,AUD,Pizza Place,Dining
+T0014,A001,2026-01-09 16:00:00,-210.00,AUD,Power Co,Utilities
+T0015,A003,2026-01-10 10:20:00,-118.40,AUD,Fresh Grocer,Groceries
+T0016,A004,2026-01-11 14:05:00,120.00,AUD,Tech Store,Refund
