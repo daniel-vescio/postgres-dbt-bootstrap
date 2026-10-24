@@ -4,7 +4,7 @@ A simple Postgres + dbt starter for PoCs. Clone it, run the setup commands below
 
 Postgres runs in Docker and dbt runs locally, so it works like any other dbt project. It's deliberately minimal. Add what you need as you go.
 
-**This is set up for Windows.** All commands below are for PowerShell.
+Commands below are for PowerShell.
 
 ## What's included
 
