@@ -77,9 +77,7 @@ docker compose down -v; docker compose up -d --wait
 
 ## Settings
 
-The defaults work without any changes. To change them, copy `.env.example` to `.env` and edit it.
-
-Docker and the CSV loader read `.env` automatically. dbt doesn't, so run it with `uv run --env-file .env dbt build`, or run `$env:UV_ENV_FILE = ".env"` once per terminal so `uv run dbt` picks it up. Running `dbt` from an activated environment won't read `.env`.
+The defaults work without any changes. To change them, copy `.env.example` to `.env` (`Copy-Item .env.example .env`) and edit it. Docker, dbt and the CSV loader all read `.env`.
 
 - **Changing the user, password or database name:** Postgres only applies these when the database is first created. After changing them, run `docker compose down -v; docker compose up -d --wait`. This deletes all data.
 - **Changing the dbt version:** update the `dbt-core` / `dbt-postgres` versions in `pyproject.toml`, then run `uv sync`.
